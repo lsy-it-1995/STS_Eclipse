@@ -1,0 +1,10 @@
+package com.appsdeveloperblog.app.ws.io.Repository;
+
+import com.appsdeveloperblog.app.ws.io.Entity.AddressEntity;
+import com.appsdeveloperblog.app.ws.io.Entity.UserEntity;
+
+public class AddressRepository extends CrudRepository<AddressEntity, Long>{
+
+
+
+}

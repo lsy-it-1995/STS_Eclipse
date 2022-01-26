@@ -1,0 +1,42 @@
+package com.appsdeveloperblog.app.ws.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.appsdeveloperblog.app.ws.io.Entity.AddressEntity;
+import com.appsdeveloperblog.app.ws.io.Entity.UserEntity;
+import com.appsdeveloperblog.app.ws.io.Repository.AddressRepository;
+import com.appsdeveloperblog.app.ws.io.Repository.UserRepository;
+import com.appsdeveloperblog.app.ws.service.AddressService;
+import com.appsdeveloperblog.app.ws.shared.dto.AddressDto;
+import com.appsdeveloperblog.app.ws.shared.dto.Utils;
+
+public class AddressServiceimpl implements AddressService {
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	
+	@Autowired
+	AddressRepository addressRepository;
+	
+	
+	@Override
+	public List<AddressDto> getAddresses(String id) {
+		List<AddressDto> list = new ArrayList<>();
+		UserEntity userEntity = userRepository.findByUserId(id);
+		if(userEntity == null) {
+			return null;
+		}
+		Iterable<AddressEntity> addresses = addressRepository.findAllByUser(userEntity);
+		for(AddressEntity address: addresses) {
+			list.add(new ModelMapper().map(userEntity, AddressDto.class));
+		}
+		return list;
+	}
+
+}

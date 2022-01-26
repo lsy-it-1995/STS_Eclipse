@@ -1,0 +1,10 @@
+package com.appsdeveloperblog.app.ws.io.Repository;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.appsdeveloperblog.app.ws.io.Entity.AddressEntity;
+
+@Repository
+public interface AddressRepository extends CrudRepository<AddressEntity, Long> {
+	Iterable<AddressEntity> findByAllUser(UserEntity userEntity);
+}
