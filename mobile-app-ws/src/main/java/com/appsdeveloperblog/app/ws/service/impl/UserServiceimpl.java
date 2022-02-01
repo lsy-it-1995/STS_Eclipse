@@ -19,6 +19,7 @@ import com.appsdeveloperblog.app.ws.io.Repository.UserRepository;
 import com.appsdeveloperblog.app.ws.exceptions.UserServiceException;
 import com.appsdeveloperblog.app.ws.io.Entity.UserEntity;
 import com.appsdeveloperblog.app.ws.service.UserService;
+import com.appsdeveloperblog.app.ws.shared.AmazonSES;
 import com.appsdeveloperblog.app.ws.shared.dto.AddressDto;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 import com.appsdeveloperblog.app.ws.shared.dto.Utils;
@@ -38,27 +39,25 @@ public class UserServiceimpl implements UserService {
 
 	@Override
 	public UserDto createUser(UserDto user) {
-
-		if (userRepository.findByEmail(user.getEmail()) != null) {
-			throw new RuntimeException("Record is already existed");
-		}
-		for (int i = 0; i < user.getAddresses().size(); i++) {
+		if (userRepository.findByEmail(user.getEmail()) != null)
+			throw new UserServiceException("Record already exists");
+		for(int i=0;i<user.getAddresses().size();i++){
 			AddressDto address = user.getAddresses().get(i);
 			address.setUserDetails(user);
-			address.setAddressId(utils.generateAddressId(30)); 
+			address.setAddressId(utils.generateAddressId(30));
+			user.getAddresses().set(i, address);
 		}
+		//BeanUtils.copyProperties(user, userEntity);
 		ModelMapper modelMapper = new ModelMapper();
-//		BeanUtils.copyProperties(user, userEntity);
 		UserEntity userEntity = modelMapper.map(user, UserEntity.class);
+
 		String publicUserId = utils.generateUserId(30);
-
-		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		userEntity.setUserId(publicUserId);
-		userEntity.setEmailVerificationToken(Utils.generateEmailVerificationToken(publicUserId));
-		userEntity.setEmailVerificationStatus(false);
+		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+		userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(publicUserId));
 		UserEntity userDetail = userRepository.save(userEntity);
-
 		UserDto userDto = modelMapper.map(userDetail, UserDto.class);
+		new AmazonSES().verifyEmail(userDto);
 		return userDto;
 	}
 
@@ -71,7 +70,7 @@ public class UserServiceimpl implements UserService {
 		// return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new
 		// ArrayList());
 		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(),
-				userEntity.getEmailVerificationStatus(), true, true, true, new ArrayList());
+				userEntity.getEmailVerificationStatus(), true, true, true, new ArrayList<>());
 	}
 
 	@Override
@@ -138,7 +137,7 @@ public class UserServiceimpl implements UserService {
 	}
 
 	@Override
-	public boolean verifyEmail(String token) {
+	public boolean verifyEmailToken(String token) {
 		boolean returnValue = false;
 		UserEntity userEntity = userRepository.findUserByEmailVerificationToken(token);
 		if (userEntity != null) {

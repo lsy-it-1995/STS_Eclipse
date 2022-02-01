@@ -1,7 +1,0 @@
-package com.appsdeveloperblog.app.ws.io.Repository;
-
-import org.springframework.data.repository.CrudRepository;
-
-public class AddressRepository implements CrudRepository<T, ID> {
-
-}

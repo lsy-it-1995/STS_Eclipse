@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter{
@@ -27,13 +28,17 @@ public class AuthorizationFilter extends BasicAuthenticationFilter{
 								 HttpServletResponse res,
 								 FilterChain chain) throws IOException, ServletException {
 		String header = req.getHeader(SecurityConstants.HEADER_STRING);
-		if(header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+		try {
+			if(header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+				chain.doFilter(req, res);
+				return;
+			}
+			UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 			chain.doFilter(req, res);
-			return;
+		}catch(ExpiredJwtException e) {
+			res.setStatus(401);
 		}
-		UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		chain.doFilter(req, res);
 	}
 	public UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) {
 		String token = req.getHeader(SecurityConstants.HEADER_STRING);
@@ -51,4 +56,5 @@ public class AuthorizationFilter extends BasicAuthenticationFilter{
 		}
 		return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
 	}
+	
 }

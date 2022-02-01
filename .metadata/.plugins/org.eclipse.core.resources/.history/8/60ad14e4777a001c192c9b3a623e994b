@@ -1,7 +1,0 @@
-
-
-public class AddressRepository extends CrudRepository<AddressEntity, Long>{
-
-
-
-}
