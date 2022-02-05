@@ -39,10 +39,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		try {
 			UserLoginRequestModel creds = new ObjectMapper().readValue(req.getInputStream(),
 					UserLoginRequestModel.class);
-
 			return authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
-
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -31,7 +31,7 @@ public class AmazonSES {
 	final String TEXTBODY = "Please verify your email address. "
 			+ "Thank you for registering with our mobile app. To complete registration process and be able to log in,"
 			+ " open then the following URL in your browser window: "
-			+ " http://ec2-13-57-38-186.us-west-1.compute.amazonaws.com:8080/verification-service/email-verification.html?token=$tokenValue"
+			+ " ec2-54-219-52-199.us-west-1.compute.amazonaws.com:8080/verification-service/email-verification.html?token=$tokenValue"
 			+ " Thank you! And we are waiting for you inside!";
 
 	final String PASSWORD_RESET_HTMLBODY = "<h1>A request to reset your password</h1>" + "<p>Hi, $firstName!</p> "

@@ -13,7 +13,6 @@ public class AddressDto {
 		this.addressId = addressId;
 	}
 
-
 	public long getId() {
 		return id;
 	}

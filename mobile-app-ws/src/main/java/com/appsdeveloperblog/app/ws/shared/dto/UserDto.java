@@ -39,7 +39,7 @@ public class UserDto implements Serializable{
 	private String emailVerificationToken;
 	
 	@Column(nullable=false)
-	private Boolean emailVerificationStatus = false;
+	private Boolean emailVerificationStatus = true;
 	
 	private List<AddressDto> addresses;
 
