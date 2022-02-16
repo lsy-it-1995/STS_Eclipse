@@ -1,0 +1,5 @@
+package com.appsdeveloperblog.app.ws.io.Repository;
+
+public interface passwordResetTokenRepository {
+
+}

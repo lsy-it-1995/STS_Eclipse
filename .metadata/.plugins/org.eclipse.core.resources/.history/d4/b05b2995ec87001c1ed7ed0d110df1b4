@@ -1,0 +1,5 @@
+package com.appsdeveloperblog.app.ws.io.Entity;
+
+public class PasswordResetTokenEntity {
+
+}

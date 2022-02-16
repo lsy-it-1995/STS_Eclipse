@@ -15,15 +15,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.appsdeveloperblog.app.ws.io.Repository.UserRepository;
 import com.appsdeveloperblog.app.ws.exceptions.UserServiceException;
+import com.appsdeveloperblog.app.ws.io.Entity.PasswordResetTokenEntity;
 import com.appsdeveloperblog.app.ws.io.Entity.UserEntity;
+import com.appsdeveloperblog.app.ws.io.Repository.PasswordResetTokenRepository;
+import com.appsdeveloperblog.app.ws.io.Repository.UserRepository;
 import com.appsdeveloperblog.app.ws.service.UserService;
 import com.appsdeveloperblog.app.ws.shared.AmazonSES;
 import com.appsdeveloperblog.app.ws.shared.dto.AddressDto;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 import com.appsdeveloperblog.app.ws.shared.dto.Utils;
 import com.appsdeveloperblog.app.ws.ui.model.response.ErrorMessages;
+
 
 @Service
 public class UserServiceimpl implements UserService {
@@ -37,6 +40,9 @@ public class UserServiceimpl implements UserService {
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 
+	@Autowired
+	PasswordResetTokenRepository passwordResetTokenRepository;
+	
 	@Override
 	public UserDto createUser(UserDto user) {
 		if (userRepository.findByEmail(user.getEmail()) != null)
@@ -150,6 +156,26 @@ public class UserServiceimpl implements UserService {
 			}
 		}
 		return returnValue;
+	}
+
+	@Override
+	public boolean requestPasswordReset(String email) {
+		
+		UserEntity userEntity = userRepository.findByEmail(email);
+		if(userEntity == null) {
+			return false;
+		}
+		String token = utils.generatePasswordResetToken(userEntity.getUserId());
+		
+		PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
+		passwordResetTokenEntity.setToken(token);
+		passwordResetTokenEntity.setUserDetails(userEntity);
+		passwordResetTokenRepository.save(passwordResetTokenEntity);
+		
+		
+		return new AmazonSES().sendPasswordResetRequest(userEntity.getFirstName(),
+														userEntity.getEmail(),
+														token);
 	}
 
 }

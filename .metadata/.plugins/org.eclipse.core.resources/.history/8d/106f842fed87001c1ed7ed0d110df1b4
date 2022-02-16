@@ -1,0 +1,10 @@
+package com.appsdeveloperblog.app.ws.io.Entity;
+
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+
+@Entity
+public class PasswordResetTokenEntity implements Serializable{
+
+}
